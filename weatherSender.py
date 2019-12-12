@@ -30,15 +30,25 @@ highTime = "never"
 lowTempF = 999
 lowTime = "never"
 
+rainChance = 0
+snowChance = 0
+
 for i in range (4):
     temp = int(data["weather"][0]["hourly"][i]["tempF"])
-    
+    rain = int(data["weather"][0]["hourly"][i]["chanceofrain"])
+    snow = int(data["weather"][0]["hourly"][i]["chanceofsnow"])
+
     if temp > highTempF:
         highTempF = temp
         highTime = IndexToNiceTime[i]
     elif temp < lowTempF:
         lowTempF = temp
         lowTime = IndexToNiceTime[i]
+
+    if rain > snowChance:
+        precipChance = rain
+    if snow > snowChance:
+        snowChance = snow
 
 message = \
 "Currently " + currentTempF + " degrees" + "\n" + \
@@ -48,5 +58,10 @@ condition + "\n" + \
 "\n" + \
 "High of " + str(highTempF) + highTime + "\n" + \
 "Low of " + str(lowTempF) + lowTime
+
+if rainChance > 0:
+    message += "\n" + str(rainChance) + "% chance of rain"
+if snowChance > 0:
+    message += "\n" + str(snowChance) + "% chance of snow"
 
 print(message)
