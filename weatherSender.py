@@ -4,7 +4,7 @@ import os
 import smtplib
 
 # Location you want the weather from
-location = "Durham_NH"
+location = ""
 url = "http://wttr.in/" + location + "?format=j1"
 
 # address you want the message sent from
@@ -14,7 +14,7 @@ email_address = os.environ.get("EMAIL_ADDRESS")
 email_password = os.environ.get("EMAIL_PASS")
 
 # address to send this report to
-recipient = "6035407703@vtext.com"
+recipient = ""
 
 # mailserver to send your request to, default to gmail
 mailServer = "smtp.gmail.com"
@@ -53,7 +53,7 @@ condition + "\n" + \
 rainChance = 0
 snowChance = 0
 
-for i in range (4):
+for i in range (8):
     rain = int(data["weather"][0]["hourly"][i]["chanceofrain"])
     snow = int(data["weather"][0]["hourly"][i]["chanceofsnow"])
 
