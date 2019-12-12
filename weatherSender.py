@@ -2,25 +2,7 @@ import requests
 import json
 import os
 
-# A typical JSON response from http://wttr.in/
-
-# {'FeelsLikeC': '1', 
-# 'FeelsLikeF': '33', 
-# 'cloudcover': '25', 
-# 'humidity': '78', 
-# 'observation_time': '03:37 AM', 
-# 'precipMM': '0.0', 'pressure': '1034', 
-# 'temp_C': '1', 
-# 'temp_F': '33', 
-# 'uvIndex': 1, 
-# 'visibility': '16', 
-# 'weatherCode': '116', 
-# 'weatherDesc': [{'value': 'Partly cloudy'}], 
-# 'weatherIconUrl': [{'value': ''}], 
-# 'winddir16Point': 'N', 
-# 'winddirDegree': '0', 
-# 'windspeedKmph': '0', 
-# 'windspeedMiles': '0'}
+IndexToNiceTime = {0: " in the morning", 1: " at noon", 2: " in the evening", 3: " at night"}
 
 # Location you want the weather from
 location = "Durham_NH"
@@ -39,10 +21,32 @@ condition = current_condition["weatherDesc"][0]["value"]
 windCompass = current_condition["winddir16Point"]
 windSpeedMPH = current_condition["windspeedMiles"]
 
+# if you live in a place where temperature is > 999 degrees
+# or < -999 degrees
+# results may be inaccurate
+highTempF = -999
+highTime = "never"
+
+lowTempF = 999
+lowTime = "never"
+
+for i in range (4):
+    temp = int(data["weather"][0]["hourly"][i]["tempF"])
+    
+    if temp > highTempF:
+        highTempF = temp
+        highTime = IndexToNiceTime[i]
+    elif temp < lowTempF:
+        lowTempF = temp
+        lowTime = IndexToNiceTime[i]
+
 message = \
 "Currently " + currentTempF + " degrees" + "\n" + \
 "Feels Like " + feelsLikeF + " degrees" + "\n" + \
 condition + "\n" + \
-"Winds " + windCompass + " at " + windSpeedMPH + " MPH"
+"Winds " + windCompass + " at " + windSpeedMPH + " MPH" + "\n" + \
+"\n" + \
+"High of " + str(highTempF) + highTime + "\n" + \
+"Low of " + str(lowTempF) + lowTime
 
 print(message)
