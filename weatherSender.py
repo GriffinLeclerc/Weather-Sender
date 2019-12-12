@@ -4,7 +4,7 @@ import os
 import smtplib
 
 # Location you want the weather from
-location = "Durham_NH"
+location = ""
 url = "http://wttr.in/" + location + "?format=j1"
 
 # address you want the message sent from
