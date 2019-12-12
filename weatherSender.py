@@ -4,7 +4,7 @@ import os
 import smtplib
 
 # Location you want the weather from
-location = ""
+location = "Durham_NH"
 url = "http://wttr.in/" + location + "?format=j1"
 
 # address you want the message sent from
@@ -14,7 +14,7 @@ email_address = os.environ.get("EMAIL_ADDRESS")
 email_password = os.environ.get("EMAIL_PASS")
 
 # address to send this report to
-recipient = ""
+recipient = "6035407703@vtext.com"
 
 # mailserver to send your request to, default to gmail
 mailServer = "smtp.gmail.com"
@@ -36,26 +36,8 @@ feelsLikeF = current_condition["FeelsLikeF"]
 condition = current_condition["weatherDesc"][0]["value"]
 windCompass = current_condition["winddir16Point"]
 windSpeedMPH = current_condition["windspeedMiles"]
-
-# if you live in a place where temperature is > 999 degrees
-# or < -999 degrees
-# results may be inaccurate
-highTempF = -999
-highTime = "never"
-
-lowTempF = 999
-lowTime = "never"
-
-
-for i in range (4):
-    temp = int(data["weather"][0]["hourly"][i]["tempF"])
-
-    if temp > highTempF:
-        highTempF = temp
-        highTime = IndexToNiceTime[i]
-    elif temp < lowTempF:
-        lowTempF = temp
-        lowTime = IndexToNiceTime[i]
+highTempF = data["weather"][0]["maxtempF"]
+lowTempF = data["weather"][0]["mintempF"]
 
 message = \
 "Currently " + currentTempF + " degrees" + "\n" + \
@@ -63,8 +45,8 @@ message = \
 condition + "\n" + \
 "Winds " + windCompass + " at " + windSpeedMPH + " MPH" + "\n" + \
 "\n" + \
-"High of " + str(highTempF) + highTime + "\n" + \
-"Low of " + str(lowTempF) + lowTime
+"High of " + str(highTempF)+ "\n" + \
+"Low of " + str(lowTempF)
 
 # Daily precipitation chances
 
