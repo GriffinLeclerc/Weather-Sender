@@ -3,29 +3,6 @@ import json
 import os
 import smtplib
 
-def checkDailyChance(property):
-    maxProperty = 0
-    startTime = 0
-
-    for i in range(8):
-        hourlyProperty = int(data["weather"][0]["hourly"][i][property])
-        time = int(data["weather"][0]["hourly"][i]["time"])
-
-        if hourlyProperty > maxProperty:
-            maxProperty = hourlyProperty
-            if startTime == 0:
-                startTime = time;
-
-    return (maxProperty, startTime)
-
-def getCivilianTime(militaryTime):
-    time = str(int((militaryTime % 1200) / 100))
-    if militaryTime > 1200:
-        time += " PM"
-    else:
-        time += " AM"
-    return time
-
 # Location you want the weather from
 location = ""
 url = "http://wttr.in/" + location + "?format=j1"
@@ -43,7 +20,33 @@ recipient = ""
 mailServer = "smtp.gmail.com"
 port = 587
 
-IndexToNiceTime = {0: " in the morning", 1: " at noon", 2: " in the evening", 3: " at night"}
+def addToMessage(item):
+    global message
+    message += "\n" + str(item)
+
+def addDailyChance(jsonProperty, propertyName):
+    maxProperty = 0
+    startTime = 0
+
+    for i in range(8):
+        hourlyProperty = int(data["weather"][0]["hourly"][i][jsonProperty])
+        time = int(data["weather"][0]["hourly"][i]["time"])
+
+        if hourlyProperty > maxProperty:
+            maxProperty = hourlyProperty
+            if startTime == 0:
+                startTime = time;
+
+    if maxProperty > 0:
+        addToMessage(str(maxProperty) + "% chance of " + propertyName + " starting at " + getCivilianTime(startTime))
+
+def getCivilianTime(militaryTime):
+    time = str(int((militaryTime % 1200) / 100))
+    if militaryTime > 1200:
+        time += " PM"
+    else:
+        time += " AM"
+    return time
 
 # Get the weather data
 response = requests.get(url)
@@ -72,24 +75,8 @@ condition + "\n" + \
 "Low of " + str(lowTempF)
 
 # Daily precipitation chances
-rainData = checkDailyChance("chanceofrain")
-rainChance = rainData[0]
-rainTime = rainData[1]
-
-snowData = checkDailyChance("chanceofsnow")
-snowChance = snowData[0]
-snowTime = snowData[1]
-
-frostData = checkDailyChance("chanceoffrost")
-frostChance = frostData[0]
-frostTime = frostData[1]
-
-if rainChance > 0:
-    message += "\n" + str(rainChance) + "% chance of rain starting at " + getCivilianTime(rainTime)
-if snowChance > 0:
-    message += "\n" + str(snowChance) + "% chance of snow starting at " + getCivilianTime(snowTime)
-if frostChance > 0:
-    message += "\n" + str(frostChance) + "% chance of frost starting at " + getCivilianTime(frostTime)
+addDailyChance("chanceofrain", "rain")
+addDailyChance("chanceofsnow", "snow")
 
 with smtplib.SMTP(mailServer, port) as smtp:
     try:
