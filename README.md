@@ -4,7 +4,7 @@ This is a simple python script that sends a plain text message containing inform
 
 ## Usage ##
 
-Before any weather can be sent, a configuration file must be generated.
+Before any weather can be sent, a configuration file must be generated. <br />
 This can be done by running:
 ```
 ./sendWeather.sh
@@ -31,7 +31,6 @@ These environment variables are used for secure email server login. <br />
 Please take a moment to set these environment variables to their corresponding values. <br />
 While you can store your credentials in the script, it is not recommended. <br />
 <br />
-
 Once you have completed configuring and set the system environment variables, messages are ready to be sent.
 Do so by running:
 ```
@@ -40,5 +39,5 @@ Do so by running:
 
 ## Required Packages and Components ##
 python3 <br />
-the ability to reach [wttr.in]{https://wttr.in} <br />
+the ability to reach [wttr.in](https://wttr.in) <br />
 an email address
