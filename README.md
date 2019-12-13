@@ -1,4 +1,4 @@
-## Weather Sender ##
+# Weather Sender
 
 This is a simple python script that sends a plain text message containing information about the weather over email.
 
