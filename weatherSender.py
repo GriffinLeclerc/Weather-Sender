@@ -3,6 +3,29 @@ import json
 import os
 import smtplib
 
+def checkDailyChance(property):
+    maxProperty = 0
+    startTime = 0
+
+    for i in range(8):
+        hourlyProperty = int(data["weather"][0]["hourly"][i][property])
+        time = int(data["weather"][0]["hourly"][i]["time"])
+
+        if hourlyProperty > maxProperty:
+            maxProperty = hourlyProperty
+            if startTime == 0:
+                startTime = time;
+
+    return (maxProperty, startTime)
+
+def getCivilianTime(militaryTime):
+    time = str(int((militaryTime % 1200) / 100))
+    if militaryTime > 1200:
+        time += " PM"
+    else:
+        time += " AM"
+    return time
+
 # Location you want the weather from
 location = ""
 url = "http://wttr.in/" + location + "?format=j1"
@@ -49,24 +72,24 @@ condition + "\n" + \
 "Low of " + str(lowTempF)
 
 # Daily precipitation chances
+rainData = checkDailyChance("chanceofrain")
+rainChance = rainData[0]
+rainTime = rainData[1]
 
-rainChance = 0
-snowChance = 0
+snowData = checkDailyChance("chanceofsnow")
+snowChance = snowData[0]
+snowTime = snowData[1]
 
-for i in range (8):
-    rain = int(data["weather"][0]["hourly"][i]["chanceofrain"])
-    snow = int(data["weather"][0]["hourly"][i]["chanceofsnow"])
-
-    if rain > snowChance:
-        rainChance = rain
-    if snow > snowChance:
-        snowChance = snow
+frostData = checkDailyChance("chanceoffrost")
+frostChance = frostData[0]
+frostTime = frostData[1]
 
 if rainChance > 0:
-    message += "\n" + str(rainChance) + "% chance of rain"
+    message += "\n" + str(rainChance) + "% chance of rain starting at " + getCivilianTime(rainTime)
 if snowChance > 0:
-    message += "\n" + str(snowChance) + "% chance of snow"
-
+    message += "\n" + str(snowChance) + "% chance of snow starting at " + getCivilianTime(snowTime)
+if frostChance > 0:
+    message += "\n" + str(frostChance) + "% chance of frost starting at " + getCivilianTime(frostTime)
 
 with smtplib.SMTP(mailServer, port) as smtp:
     try:
