@@ -2,23 +2,28 @@ import requests
 import json
 import os
 import smtplib
-
-# Location you want the weather from
-location = ""
-url = "http://wttr.in/" + location + "?format=j1"
+import configparser
 
 # address you want the message sent from
 # to protect those using this script, email address and password are gathered from environment variables
-# please add these two environemnt variables with your corresponding contents, rather than storing your credentials in plain text
+# please add these two environemnt variables with your corresponding contents, 
+# rather than storing your credentials in plain text in this script
 email_address = os.environ.get("EMAIL_ADDRESS")
 email_password = os.environ.get("EMAIL_PASS")
 
+config = configparser.ConfigParser()
+config.read('config.ini')
+
+# Location you want the weather from
+location = config["Weather"]["location"]
+url = "http://wttr.in/" + location + "?format=j1"
+
 # address to send this report to
-recipient = ""
+recipient = config["Message"]["recipient"]
 
 # mailserver to send your request to, default to gmail
-mailServer = "smtp.gmail.com"
-port = 587
+mailServer = config["Message"]["mail_server"]
+port = config["Message"]["port"]
 
 def addToMessage(item):
     global message
@@ -78,6 +83,7 @@ condition + "\n" + \
 addDailyChance("chanceofrain", "rain")
 addDailyChance("chanceofsnow", "snow")
 
+# Send the created message
 with smtplib.SMTP(mailServer, port) as smtp:
     try:
         smtp.starttls()
@@ -86,5 +92,5 @@ with smtplib.SMTP(mailServer, port) as smtp:
         smtp.sendmail(email_address, recipient, message)
     except Exception as e:
         print("Unable to send message: " + str(e))
-        print("Please ensure your credentials are correct. Such as desired email server and recipient address.")
+        print("Please ensure your configuration file is correct.")
         print("Also ensure you have system environment variables EMAIL_ADDRESS and EMAIL_PASS set accordingly.")
