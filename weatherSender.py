@@ -3,6 +3,7 @@ import json
 import os
 import smtplib
 import configparser
+import time
 
 # address you want the message sent from
 # to protect those using this script, email address and password are gathered from environment variables
@@ -25,11 +26,7 @@ recipient = config["Message"]["recipient"]
 mailServer = config["Message"]["mail_server"]
 port = config["Message"]["port"]
 
-def addToMessage(item):
-    global message
-    message += "\n" + str(item)
-
-def addDailyChance(jsonProperty, propertyName):
+def dailyPrecipitationChance(jsonProperty, propertyName):
     maxProperty = 0
     startTime = 0
 
@@ -43,7 +40,8 @@ def addDailyChance(jsonProperty, propertyName):
                 startTime = time;
 
     if maxProperty > 0:
-        addToMessage(str(maxProperty) + "% chance of " + propertyName + " starting at " + getCivilianTime(startTime))
+        return (str(maxProperty) + "% chance of " + propertyName + " starting at " + getCivilianTime(startTime))
+    return ""
 
 def getCivilianTime(militaryTime):
     time = str(int((militaryTime % 1200) / 100))
@@ -52,6 +50,20 @@ def getCivilianTime(militaryTime):
     else:
         time += " AM"
     return time
+
+def sendMessage(message):
+    with smtplib.SMTP(mailServer, port) as smtp:
+        try:
+            smtp.starttls()
+            smtp.login(email_address, email_password)
+
+            smtp.sendmail(email_address, recipient, message)
+
+            smtp.quit()
+        except Exception as e:
+            print("Unable to send message: " + str(e))
+            print("Please ensure your configuration file is correct.")
+            print("Also ensure you have system environment variables EMAIL_ADDRESS and EMAIL_PASS set accordingly.")
 
 # Get the weather data
 response = requests.get(url)
@@ -70,27 +82,29 @@ windSpeedMPH = current_condition["windspeedMiles"]
 highTempF = data["weather"][0]["maxtempF"]
 lowTempF = data["weather"][0]["mintempF"]
 
-message = \
+currentConditions = \
 "Currently " + currentTempF + " degrees" + "\n" + \
 "Feels Like " + feelsLikeF + " degrees" + "\n" + \
 condition + "\n" + \
 "Winds " + windCompass + " at " + windSpeedMPH + " MPH" + "\n" + \
 "\n" + \
-"High of " + str(highTempF)+ "\n" + \
+"High of " + str(highTempF) + "\n" + \
 "Low of " + str(lowTempF)
 
 # Daily precipitation chances
-addDailyChance("chanceofrain", "rain")
-addDailyChance("chanceofsnow", "snow")
+dailyChances = (\
+dailyPrecipitationChance("chanceofrain", "rain") + "\n" + \
+dailyPrecipitationChance("chanceofsnow", "snow") + "\n" + \
+dailyPrecipitationChance("chanceoffog", "fog")).strip()
 
-# Send the created message
-with smtplib.SMTP(mailServer, port) as smtp:
-    try:
-        smtp.starttls()
-        smtp.login(email_address, email_password)
+# Send the created messages
+sendMessage(currentConditions)
+# The current conditions message is (on average) more characters than
+# the precipitations message. Meaning, reguardless of order sent, mail servers will
+# more quickly process and forward the daily chances message THEN forward the current 
+# conditions message.
+# Because the messages should be received in the opposite order, the script
+# waits 1 second to give the servers time to forward the first message.
+time.sleep(1)
 
-        smtp.sendmail(email_address, recipient, message)
-    except Exception as e:
-        print("Unable to send message: " + str(e))
-        print("Please ensure your configuration file is correct.")
-        print("Also ensure you have system environment variables EMAIL_ADDRESS and EMAIL_PASS set accordingly.")
+sendMessage(dailyChances)
