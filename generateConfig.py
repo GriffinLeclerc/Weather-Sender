@@ -14,7 +14,8 @@ config['Weather'] = {
 config['Message'] = {
     'recipient': 'none',
     'mail_server': 'smtp.gmail.com',
-    'port': '587'
+    'port': '587',
+    'militaryTime' : 'False'
 }
 
 with open('config.ini', 'w') as configfile:

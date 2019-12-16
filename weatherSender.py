@@ -22,6 +22,11 @@ url = "http://wttr.in/" + location + "?format=j1"
 # address to send this report to
 recipient = config["Message"]["recipient"]
 
+configMilitaryTime = config["Message"]["militaryTime"]
+useMilitaryTime = False
+if configMilitaryTime.lower() in ['true', 't', 'y', 'yes', '1']:
+    useMilitaryTime = True
+
 # mailserver to send your request to, default to gmail
 mailServer = config["Message"]["mail_server"]
 port = config["Message"]["port"]
@@ -43,21 +48,26 @@ def dailyPrecipitationChance(jsonProperty, propertyName):
                     tomorrow = True
 
     if maxProperty > 0:
-        return (str(maxProperty) + "% chance of " + propertyName + " starting at " + getCivilianTime(startTime, tomorrow))
+        return (str(maxProperty) + "% chance of " + propertyName + " starting at " + getTime(startTime, tomorrow))
     return ""
 
-def getCivilianTime(militaryTime, tomorrow):
-    civilianTime = int((militaryTime % 1200) / 100)
+def getTime(militaryTime, tomorrow):
+    time = ""
 
-    if civilianTime == 0:
-        civilianTime = 12
-
-    time = str(civilianTime)
-
-    if militaryTime >= 1200:
-        time += " PM"
+    if(useMilitaryTime):
+        time = str(militaryTime)
     else:
-        time += " AM"
+        civilianTime = int((militaryTime % 1200) / 100)
+
+        if civilianTime == 0:
+            civilianTime = 12
+
+        time = str(civilianTime)
+        
+        if militaryTime >= 1200:
+            time += " PM"
+        else:
+            time += " AM"
 
     # if the information pertains to tomorrow at 12 AM
     if tomorrow:

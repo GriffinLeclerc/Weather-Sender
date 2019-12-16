@@ -15,13 +15,15 @@ location = none
 recipient = none
 mailServer = smtp.gmail.com
 port = 587 
+militaryTime = False
 ```
 Where: <br />
 location is where you wish to see the weather reported from. <br />
 recipient is where you wish to send the generated message. <br />
 mailServer is the email server you wish to log into. Defaults to smtp.gmail.com. <br />
 port is the port of the email server you wish to connect to. Defaults to 587. <br />
-
+militaryTime definses whether or not weather alerts are conveyed using civilian or military time.<br />     True = Miltary time, False = Civilian time. Defaults to False. <br />
+<br />
 The script relies on two system environment variables: <br />
 ```
 EMAIL_ADDRESS
