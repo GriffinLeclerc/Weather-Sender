@@ -30,25 +30,39 @@ def dailyPrecipitationChance(jsonProperty, propertyName):
     maxProperty = 0
     startTime = 0
 
-    for i in range(8):
-        hourlyProperty = int(data["weather"][0]["hourly"][i][jsonProperty])
-        time = int(data["weather"][0]["hourly"][i]["time"])
+    for i in range(9):
+        hourlyProperty = int(data["weather"][int(i/8)]["hourly"][int(i%8)][jsonProperty])
+        time = int(data["weather"][int(i/8)]["hourly"][int(i%8)]["time"])
+        tomorrow = False
 
         if hourlyProperty > maxProperty:
             maxProperty = hourlyProperty
             if startTime == 0:
                 startTime = time;
+                if i > 7:
+                    tomorrow = True
 
     if maxProperty > 0:
-        return (str(maxProperty) + "% chance of " + propertyName + " starting at " + getCivilianTime(startTime))
+        return (str(maxProperty) + "% chance of " + propertyName + " starting at " + getCivilianTime(startTime, tomorrow))
     return ""
 
-def getCivilianTime(militaryTime):
-    time = str(int((militaryTime % 1200) / 100))
-    if militaryTime > 1200:
+def getCivilianTime(militaryTime, tomorrow):
+    civilianTime = int((militaryTime % 1200) / 100)
+
+    if civilianTime == 0:
+        civilianTime = 12
+
+    time = str(civilianTime)
+
+    if militaryTime >= 1200:
         time += " PM"
     else:
         time += " AM"
+
+    # if the information pertains to tomorrow at 12 AM
+    if tomorrow:
+        time += " tomorrow"
+
     return time
 
 def sendMessage(message):
@@ -98,13 +112,14 @@ dailyPrecipitationChance("chanceofsnow", "snow") + "\n" + \
 dailyPrecipitationChance("chanceoffog", "fog")).strip()
 
 # Send the created messages
-sendMessage(currentConditions)
+
 # The current conditions message is (on average) more characters than
 # the precipitations message. Meaning, reguardless of order sent, mail servers will
 # more quickly process and forward the daily chances message THEN forward the current 
 # conditions message.
 # Because the messages should be received in the opposite order, the script
-# waits 1 second to give the servers time to forward the first message.
-time.sleep(1)
+# waits 2 seconds to give the servers time to forward the first message.
 
+sendMessage(currentConditions)
+time.sleep(2)
 sendMessage(dailyChances)
