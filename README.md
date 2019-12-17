@@ -1,6 +1,6 @@
 # Weather Sender
 
-This is a simple python script that sends a plain text message containing information about the weather over email.
+This is a simple python script that sends a plain text message containing information about the weather over SMTP.
 
 ## Usage ##
 
@@ -22,7 +22,8 @@ location is where you wish to see the weather reported from. <br />
 recipient is where you wish to send the generated message. <br />
 mailServer is the email server you wish to log into. Defaults to smtp.gmail.com. <br />
 port is the port of the email server you wish to connect to. Defaults to 587. <br />
-militaryTime definses whether or not weather alerts are conveyed using civilian or military time.<br />     True = Miltary time, False = Civilian time. Defaults to False. <br />
+militaryTime definses whether or not weather alerts are conveyed using civilian or military time. <br />
+True = Miltary time, False = Civilian time. Defaults to False. <br />
 <br />
 The script relies on two system environment variables: <br />
 ```
