@@ -76,6 +76,9 @@ def getTime(militaryTime, tomorrow):
     return time
 
 def sendMessage(message):
+    if(message.strip() == ""):
+        return
+    
     with smtplib.SMTP(mailServer, port) as smtp:
         try:
             smtp.starttls()
