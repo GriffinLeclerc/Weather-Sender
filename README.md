@@ -7,7 +7,7 @@ This is a simple python script that sends a plain text message containing inform
 Before any weather can be sent, a configuration file must be generated. <br />
 This can be done by running:
 ```
-./sendWeather.sh
+./sendWeather
 ```
 Additionally, you will need to fill in the following configuration values. <br />
 ```
@@ -37,7 +37,7 @@ While you can store your credentials in the script, it is not recommended. <br /
 Once you have completed configuring and set the system environment variables, messages are ready to be sent.
 Do so by running:
 ```
-./sendWeather.sh
+./sendWeather
 ```
 
 ## Required Packages and Components ##
